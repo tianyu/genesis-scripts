@@ -63,6 +63,7 @@ window.Player = function (gwc) {
   this.hunt = function (target) {
     var attack = this.kill(target);
     return {
+      here: attack,
       n: function () { this.n(); attack(); },
       s: function () { this.s(); attack(); },
       e: function () { this.e(); attack(); },

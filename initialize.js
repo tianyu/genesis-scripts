@@ -3,25 +3,30 @@
 
 var Tasks = function () {
   var list = [];
+
   this.resume = function () {
     var fn = list.pop();
     if (!fn) return false;
     fn.apply(null, arguments);
     return true;
   };
+
   this.clear = function () {
     list = [];
   };
+
   this.pushOne = function (task) {
     if (!task) return;
     list.push(task);
   }
+
   this.push = function (tasks) {
     tasks = tasks || [];
     while (tasks.length > 0) {
       this.pushOne(tasks.pop());
     }
   };
+
   this.repeat = function (name, task) {
     var stopHint = name? "stop " + name : "stop";
     var repeatingTask = function (hint) {
@@ -38,21 +43,22 @@ var Tasks = function () {
 
 var Commands = function (gwc) {
   var send = gwc.connection.send;
+  var exec = function (cmd) {
+    return function () { send(cmd); };
+  };
 
   // Movement
-  this.north = function () { send('north'); };
-  this.south = function () { send('south'); };
-  this.east =  function () { send('east'); };
-  this.west =  function () { send('west'); };
-  this.northeast = function () { send('northeast'); };
-  this.northwest = function () { send('northwest'); };
-  this.southeast = function () { send('southeast'); };
-  this.southwest = function () { send('southwest'); };
+  this.north = exec('north');
+  this.south = exec('south');
+  this.east =  exec('east');
+  this.west =  exec('west');
+  this.northeast = exec('northeast');
+  this.northwest = exec('northwest');
+  this.southeast = exec('southeast');
+  this.southwest = exec('southwest');
 
   // Battle
-  this.kill = function (target) {
-    return function () { send('kill ' + target); };
-  };
+  this.kill = function (target) { return exec('kill ' + target); };
 };
 
 var Player = function (gwc) {

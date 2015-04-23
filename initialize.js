@@ -62,6 +62,7 @@ var Player = function (gwc) {
   this.resume = tasks.resume;
   this.abort = tasks.clear;
   this.todo = tasks.push;
+  this.repeatedly = tasks.repeat;
 
   this.move = {
     n: cmds.north,

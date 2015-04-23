@@ -26,19 +26,6 @@ var Tasks = function () {
       this.pushOne(tasks.pop());
     }
   };
-
-  this.repeat = function (name, task) {
-    var stopHint = name? "stop " + name : "stop";
-    var repeatingTask = function (hint) {
-      if (stopHint === hint) {
-        this.resume.apply(this, arguments);
-      } else {
-        this.pushOne(repeatingTask);
-        task.apply(null, arguments);
-      }
-    };
-    this.pushOne(repeatingTask);
-  };
 };
 
 var Commands = function (gwc) {
@@ -68,7 +55,6 @@ var Player = function (gwc) {
   this.resume = tasks.resume;
   this.abort = tasks.clear;
   this.todo = tasks.push;
-  this.repeatedly = tasks.repeat;
 
   this.move = {
     n: cmds.north,
@@ -79,6 +65,20 @@ var Player = function (gwc) {
     nw: cmds.northwest,
     se: cmds.southeast,
     sw: cmds.southwest
+  };
+
+  this.repeatedly = function (name, action) {
+    var stop = 'stop ' + name;
+    var repeatingAction = function (hint) {
+      if (hint === stop) {
+        // Don't execute the action
+        this.resume(); // Continue to the next task without hints
+      } else {
+        this.todo([repeatingAction]); // Requeue this action
+        action(); // Execute the action
+      }
+    };
+    return repeatingAction;
   };
 
   this.moveAnd = function (action) {
@@ -101,7 +101,9 @@ var Player = function (gwc) {
 
   this.kill = cmds.kill;
   this.hunt = function (target) {
-    return this.moveAnd(this.kill(target));
+    return this.moveAnd(
+      this.repeatedly("killing " + target, this.kill(target))
+    );
   };
 };
 

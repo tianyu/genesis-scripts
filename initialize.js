@@ -29,32 +29,30 @@ var Tasks = function () {
 };
 
 var Commands = function (gwc) {
-  var send = gwc.connection.send;
-  var exec = function (cmd) {
-    return function () { send(cmd); };
-  };
+  var conn = gwc.connection;
+  var send = conn.send;
 
   // Movement
-  this.north = exec('north');
-  this.south = exec('south');
-  this.east =  exec('east');
-  this.west =  exec('west');
-  this.northeast = exec('northeast');
-  this.northwest = exec('northwest');
-  this.southeast = exec('southeast');
-  this.southwest = exec('southwest');
+  this.north = send.bind(conn, 'north');
+  this.south = send.bind(conn, 'south');
+  this.east =  send.bind(conn, 'east');
+  this.west =  send.bind(conn, 'west');
+  this.northeast = send.bind(conn, 'northeast');
+  this.northwest = send.bind(conn, 'northwest');
+  this.southeast = send.bind(conn, 'southeast');
+  this.southwest = send.bind(conn, 'southwest');
 
   // Battle
-  this.kill = function (target) { return exec('kill ' + target); };
+  this.kill = function (target) { return send.bind(conn, 'kill ' + target); };
 };
 
 var Player = function (gwc) {
   var tasks = new Tasks();
   var cmds = new Commands(gwc);
 
-  this.resume = tasks.resume;
-  this.abort = tasks.clear;
-  this.todo = tasks.push;
+  this.resume = tasks.resume.bind(tasks);
+  this.abort = tasks.clear.bind(tasks);
+  this.todo = tasks.push.bind(tasks);
 
   this.move = {
     n: cmds.north,
@@ -99,7 +97,7 @@ var Player = function (gwc) {
     };
   };
 
-  this.kill = cmds.kill;
+  this.kill = cmds.kill.bind(cmds);
   this.hunt = function (target) {
     return this.moveAnd(
       this.repeatedly("killing " + target, this.kill(target))

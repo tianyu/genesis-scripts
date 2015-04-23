@@ -25,33 +25,33 @@ var Tasks = function () {
   this.repeat = function (name, task) {
     var stopHint = name? "stop " + name : "stop";
     var repeatingTask = function (hint) {
-      if (stopHint === hint) return this.resume.apply(this, arguments);
-      this.pushOne(repeatingTask);
-      return task.apply(null, arguments);
+      if (stopHint === hint) {
+        this.resume.apply(this, arguments);
+      } else {
+        this.pushOne(repeatingTask);
+        task.apply(null, arguments);
+      }
     };
     this.pushOne(repeatingTask);
   };
 };
 
 var Commands = function (gwc) {
-  var send = function(cmd) {
-    gwc.connection.send(cmd);
-    return true;
-  };
+  var send = gwc.connection.send;
 
   // Movement
-  this.north = function () { return send('north'); };
-  this.south = function () { return send('south'); };
-  this.east =  function () { return send('east'); };
-  this.west =  function () { return send('west'); };
-  this.northeast = function () { return send('northeast'); };
-  this.northwest = function () { return send('northwest'); };
-  this.southeast = function () { return send('southeast'); };
-  this.southwest = function () { return send('southwest'); };
+  this.north = function () { send('north'); };
+  this.south = function () { send('south'); };
+  this.east =  function () { send('east'); };
+  this.west =  function () { send('west'); };
+  this.northeast = function () { send('northeast'); };
+  this.northwest = function () { send('northwest'); };
+  this.southeast = function () { send('southeast'); };
+  this.southwest = function () { send('southwest'); };
 
   // Battle
   this.kill = function (target) {
-    return function () { return send('kill ' + target); };
+    return function () { send('kill ' + target); };
   };
 };
 
@@ -77,7 +77,7 @@ var Player = function (gwc) {
   this.moveAnd = function (action) {
     var move = this.move;
     var executeAfter = function (movement) {
-      return function () { movement(); return action(); };
+      return function () { movement(); action(); };
     };
     return {
       here: action,

@@ -105,5 +105,5 @@ var Player = function (gwc) {
   };
 };
 
-window.me = new Player(gwc);
-console.log('Initialized');
+// Create the Player if we're running in the browser
+if (!global) window.I = new Player(gwc);

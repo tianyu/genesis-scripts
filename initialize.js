@@ -57,8 +57,8 @@ var Player = function (gwc) {
   this.move = {
     n: cmds.north,
     s: cmds.south,
-    e:  cmds.east,
-    w:  cmds.west,
+    e: cmds.east,
+    w: cmds.west,
     ne: cmds.northeast,
     nw: cmds.northwest,
     se: cmds.southeast,

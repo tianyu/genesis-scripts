@@ -3,6 +3,9 @@
 
 var Tasks = function () {
   var list = [];
+  var isFunction = function (obj) {
+    return !!(obj && obj.constructor && obj.call && obj.apply);
+  }
 
   this.resume = function () {
     var fn = list.pop();
@@ -15,15 +18,12 @@ var Tasks = function () {
     list = [];
   };
 
-  this.pushOne = function (task) {
-    if (!task) return;
-    list.push(task);
-  }
-
-  this.push = function (tasks) {
-    tasks = tasks || [];
-    while (tasks.length > 0) {
-      this.pushOne(tasks.pop());
+  this.push = function () {
+    for (i = arguments.length-1; i >= 0; i--) {
+      var task = arguments[i];
+      if (!isFunction(task))
+        throw new TypeError('Arguments must be functions');
+      list.push(task);
     }
   };
 };

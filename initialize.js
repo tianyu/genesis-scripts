@@ -1,11 +1,12 @@
 // This script should be run when the user logs in.
-// E.g. Trigger on "Welcome to Genesis".
+// E.g. Trigger on 'Welcome to Genesis'.
+
+var isFunction = function (obj) {
+  return !!(obj && obj.constructor && obj.call && obj.apply);
+}
 
 var Tasks = function () {
   var list = [];
-  var isFunction = function (obj) {
-    return !!(obj && obj.constructor && obj.call && obj.apply);
-  }
 
   this.resume = function () {
     var fn = list.pop();
@@ -30,7 +31,9 @@ var Tasks = function () {
 
 var Commands = function (gwc) {
   var conn = gwc.connection;
-  var send = conn.send;
+  var send = conn.send.bind(conn);
+
+  this.exec = send;
 
   // Movement
   this.north = send.bind(conn, 'north');
@@ -53,36 +56,41 @@ var Player = function (gwc) {
   this.resume = tasks.resume.bind(tasks);
   this.abort = tasks.clear.bind(tasks);
   this.todo = tasks.push.bind(tasks);
+  this.perform = cmds.exec.bind(cmds);
 
   this.move = {
-    n: cmds.north,
-    s: cmds.south,
-    e: cmds.east,
-    w: cmds.west,
-    ne: cmds.northeast,
-    nw: cmds.northwest,
-    se: cmds.southeast,
-    sw: cmds.southwest
+    n: cmds.north.bind(cmds),
+    s: cmds.south.bind(cmds),
+    e: cmds.east.bind(cmds),
+    w: cmds.west.bind(cmds),
+    ne: cmds.northeast.bind(cmds),
+    nw: cmds.northwest.bind(cmds),
+    se: cmds.southeast.bind(cmds),
+    sw: cmds.southwest.bind(cmds)
   };
 
   this.repeatedly = function (name, action) {
+    if (!isFunction(action)) throw new TypeError('Action is not a function');
     var stop = 'stop ' + name;
+    var resume = this.resume.bind(this);
+    var todo = this.todo.bind(this);
     var repeatingAction = function (hint) {
       if (hint === stop) {
         // Don't execute the action
-        this.resume(); // Continue to the next task without hints
+        resume(); // Continue to the next task without hints
       } else {
-        this.todo([repeatingAction]); // Requeue this action
+        todo(repeatingAction); // Requeue this action
         action(); // Execute the action
       }
-    };
+    }.bind(this);
     return repeatingAction;
   };
 
   this.moveAnd = function (action) {
+    if (!isFunction(action)) throw new TypeError('Argument is not a function');
     var move = this.move;
     var executeAfter = function (movement) {
-      return function () { movement(); action(); };
+      return function () { movement(); action.apply(null, arguments); };
     };
     return {
       here: action,
@@ -100,7 +108,7 @@ var Player = function (gwc) {
   this.kill = cmds.kill.bind(cmds);
   this.hunt = function (target) {
     return this.moveAnd(
-      this.repeatedly("killing " + target, this.kill(target))
+      this.repeatedly('hunting', this.kill(target))
     );
   };
 };

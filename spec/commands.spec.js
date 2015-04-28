@@ -1,5 +1,3 @@
-include('./initialize.js');
-
 describe('Commands', function () {
   var movements = [
     'north', 'south', 'east', 'west',

@@ -1,5 +1,3 @@
-include('./initialize.js');
-
 describe('Player', function () {
   var move2str = function (move) {
     return {
@@ -84,7 +82,7 @@ describe('Player', function () {
             args.push(arguments[i]);
           }
         })[dir]('some', 'arguments', 1, 2, 3);
-        expect(gwc.observe()).toEqual([move2str(dir)]);
+        if (dir != 'here') expect(gwc.observe()).toEqual([move2str(dir)]);
         expect(args).toEqual(['some', 'arguments', 1, 2, 3]);
       });
     };

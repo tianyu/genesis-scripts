@@ -33,8 +33,6 @@ var Commands = function (gwc) {
   var conn = gwc.connection;
   var send = conn.send.bind(conn);
 
-  this.exec = send;
-
   // Movement
   this.north = send.bind(conn, 'north');
   this.south = send.bind(conn, 'south');
@@ -56,7 +54,6 @@ var Player = function (gwc) {
   this.resume = tasks.resume.bind(tasks);
   this.abort = tasks.clear.bind(tasks);
   this.todo = tasks.push.bind(tasks);
-  this.perform = cmds.exec.bind(cmds);
 
   this.move = {
     n: cmds.north.bind(cmds),
@@ -114,4 +111,4 @@ var Player = function (gwc) {
 };
 
 // Create the Player if we're running in the browser
-if (!global) window.I = new Player(gwc);
+I = new Player(gwc);

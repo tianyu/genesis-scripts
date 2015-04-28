@@ -1,5 +1,3 @@
-include('./initialize.js');
-
 describe('Tasks', function () {
 
   describe('.push()', function () {

@@ -1,5 +1,3 @@
-include('./initialize.js');
-
 describe('Player', function () {
   var move2str = function (move) {
     return {
@@ -33,16 +31,18 @@ describe('Player', function () {
   describe('.move', function () {
     var gwc = new MockGwc();
     var move = new Player(gwc).move;
+    
+    var descDirection = function (dir) {
+      it('is a task that moves the player ' + move2str(dir), function () {
+        move[dir]();
+        expect(gwc.observe()).toEqual([move2str(dir)]);
+      });
+    };
 
     var dirs = ['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'];
     for (var i in dirs) {
       var dir = dirs[i];
-      describe('.' + dir, function () {
-        it('is a task that moves the player ' + move2str(dir), function () {
-          move[dir]();
-          expect(gwc.observe()).toEqual([move2str(dir)]);
-        });
-      });
+      describe('.' + dir, descDirection.bind(this, dir));
     }
   });
 
@@ -66,31 +66,33 @@ describe('Player', function () {
       expect(I.moveAnd.bind(I, 23)).toThrowError(TypeError);
       expect(I.moveAnd.bind(I, {foo:'bar'})).toThrowError(TypeError);
     });
+    
+    var descDirection = function (dir) {
+      it('is a task that moves the player ' + move2str(dir) + ' and performs the task', function () {
+        greet[dir]();
+        var expected = ['say hello'];
+        if (dir != 'here') expected.unshift(move2str(dir));
+        expect(gwc.observe()).toEqual(expected);
+      });
+
+      it('passes all arguments to the task', function () {
+        var args = [];
+        I.moveAnd(function () {
+          for (var i in arguments) {
+            args.push(arguments[i]);
+          }
+        })[dir]('some', 'arguments', 1, 2, 3);
+        if (dir != 'here') expect(gwc.observe()).toEqual([move2str(dir)]);
+        expect(args).toEqual(['some', 'arguments', 1, 2, 3]);
+      });
+    };
 
     var greet = I.moveAnd(gwc.connection.send.bind(gwc.connection, 'say hello'));
     var dirs = ['here', 'n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'];
-    for (i in dirs) {
+    for (var i in dirs) {
       var dir = dirs[i];
-      describe('.' + dir, function () {
-        it('is a task that moves the player ' + move2str(dir) + ' and performs the task', function () {
-          greet[dir]();
-          var expected = ['say hello'];
-          if (dir != 'here') expected.unshift(move2str(dir));
-          expect(gwc.observe()).toEqual(expected);
-        });
-
-        it('passes all arguments to the task', function () {
-          var args = [];
-          I.moveAnd(function () {
-            for (i in arguments) {
-              args.push(arguments[i]);
-            }
-          })[dir]('some', 'arguments', 1, 2, 3);
-          expect(gwc.observe()).toEqual([move2str(dir)]);
-          expect(args).toEqual(['some', 'arguments', 1, 2, 3]);
-        });
-      });
-    };
+      describe('.' + dir, descDirection.bind(this, dir));
+    }
   });
 
   describe('.repeatedly(name, task)', function () {

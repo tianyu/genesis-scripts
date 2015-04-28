@@ -6,16 +6,19 @@ describe('Commands', function () {
     'northeast', 'northwest',
     'southeast', 'southwest',
   ];
+  
+  var descMovement = function (movement) {
+    it('is a task that moves ' + movement, function () {
+      var gwc = new MockGwc();
+      var cmds = new Commands(gwc);
+      cmds[movement]();
+      expect(gwc.sent).toEqual([movement]);
+    });
+  };
+  
   for (var i in movements) {
     var movement = movements[i];
-    describe('.' + movement, function () {
-      it('is a task that moves ' + movement, function () {
-        var gwc = new MockGwc();
-        var cmds = new Commands(gwc);
-        cmds[movement]();
-        expect(gwc.sent).toEqual([movement]);
-      });
-    });
+    describe('.' + movement, descMovement.bind(this, movement));
   }
 
   describe('.kill(target)', function () {

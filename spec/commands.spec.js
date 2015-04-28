@@ -6,7 +6,7 @@ describe('Commands', function () {
     'northeast', 'northwest',
     'southeast', 'southwest',
   ];
-  for (i in movements) {
+  for (var i in movements) {
     var movement = movements[i];
     describe('.' + movement, function () {
       it('is a task that moves ' + movement, function () {

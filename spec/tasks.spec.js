@@ -78,7 +78,7 @@ describe('Tasks', function () {
       var hints = [];
 
       tasks.push(function () {
-        for (i in arguments) { hints.push(arguments[i]); }
+        for (var i in arguments) { hints.push(arguments[i]); }
       });
 
       tasks.resume(["a", "b", "c"], 5, null, 7);

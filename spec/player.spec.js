@@ -35,7 +35,7 @@ describe('Player', function () {
     var move = new Player(gwc).move;
 
     var dirs = ['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'];
-    for (i in dirs) {
+    for (var i in dirs) {
       var dir = dirs[i];
       describe('.' + dir, function () {
         it('is a task that moves the player ' + move2str(dir), function () {
@@ -43,7 +43,7 @@ describe('Player', function () {
           expect(gwc.observe()).toEqual([move2str(dir)]);
         });
       });
-    };
+    }
   });
 
   describe('.kill(target)', function () {

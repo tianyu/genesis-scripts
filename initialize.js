@@ -3,7 +3,7 @@
 
 var isFunction = function (obj) {
   return !!(obj && obj.constructor && obj.call && obj.apply);
-}
+};
 
 var Tasks = function () {
   var list = [];
